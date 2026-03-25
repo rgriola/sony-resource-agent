@@ -4,19 +4,20 @@ import { useState, useEffect } from "react";
 import {
   FileText,
   Upload,
-  Trash2,
+  ExternalLink,
   FolderSync,
   Loader2,
   CircleDot,
 } from "lucide-react";
 import {
   listDocuments,
-  deleteDocument,
   getScanStatus,
   triggerScan,
   DocumentInfo,
   ScanStatus,
 } from "@/lib/api";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface DocumentSidebarProps {
   selectedDocument: string | undefined;
@@ -87,12 +88,8 @@ export default function DocumentSidebar({
     }
   };
 
-  const handleDelete = async (filename: string) => {
-    if (!confirm(`Delete all chunks from "${filename}"?`)) return;
-    await deleteDocument(filename);
-    if (selectedDocument === filename) onSelectDocument(undefined);
-    fetchDocs();
-    fetchScanStatus();
+  const handleOpenInBrowser = (filename: string) => {
+    window.open(`${API_URL}/api/pdfs/${encodeURIComponent(filename)}`, "_blank");
   };
 
   const pendingCount = scanStatus?.pending_ingestion?.length ?? 0;
@@ -192,11 +189,11 @@ export default function DocumentSidebar({
                 </div>
               </button>
               <button
-                onClick={() => handleDelete(doc.source_file)}
-                className="ml-1 rounded p-1 text-zinc-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-950"
-                title="Delete"
+                onClick={() => handleOpenInBrowser(doc.source_file)}
+                className="ml-1 rounded p-1 text-zinc-400 opacity-0 transition-all hover:bg-blue-50 hover:text-blue-600 group-hover:opacity-100 dark:hover:bg-blue-950"
+                title="Open in browser"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <ExternalLink className="h-3.5 w-3.5" />
               </button>
             </div>
           ))

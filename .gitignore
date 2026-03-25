@@ -18,6 +18,9 @@ backend/data/
 pdfs/
 
 # Node
+node_modules/
+package-lock.json
+package-lock.json.bak
 frontend/node_modules/
 frontend/.next/
 backend/frontend/node_modules/

@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 
 from app.config import settings
 from app.models import QueryRequest, QueryResponse, IngestionResponse, ProviderConfig
@@ -168,11 +168,14 @@ async def serve_pdf(filename: str):
     if not file_path.is_file():
         raise HTTPException(status_code=404, detail=f"PDF '{filename}' not found.")
 
-    return FileResponse(
-        path=str(file_path),
+    pdf_bytes = file_path.read_bytes()
+    return Response(
+        content=pdf_bytes,
         media_type="application/pdf",
-        filename=filename,
-        headers={"Accept-Ranges": "bytes"},
+        headers={
+            "Content-Disposition": "inline",
+            "Cache-Control": "no-store",
+        },
     )
 
 
